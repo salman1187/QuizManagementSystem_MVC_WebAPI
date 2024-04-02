@@ -1,0 +1,64 @@
+﻿@model QuizManagementSystem.MVC.Models.ViewModels.TeamMemberViewModel
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+@if (ViewBag.UnplacedMembers == null || ViewBag.UnplacedMembers.Count == 0)
+{
+    <div>No members to add to teams </div>
+}
+else
+{
+    <!-- Form for adding members to teams -->
+    using (Html.BeginForm("Add", "ManageQuizMembers", FormMethod.Post))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.MemberId, "Select Member:")
+            @Html.DropDownListFor(model => model.MemberId, new SelectList(ViewBag.UnplacedMembers, "MemberId", "MemberName"), "Select Member", new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Select Team:")
+            @foreach (var team in ViewBag.Teams)
+            {
+                if (team.TheMembers.Count < 3)
+                {
+                    <label>
+                        <input type="radio" name="TeamId" value="@team.TeamId" /> @team.TeamName
+                    </label>
+                }
+            }
+        </div>
+
+        <button type="submit" class="btn btn-primary">Add Member to Team</button>
+    }
+}
+    <hr />
+
+    <!-- Form for deleting members from teams -->
+    <h3>Delete Members from Teams</h3>
+    @foreach (var team in ViewBag.Teams)
+    {
+        <h4>@team.TeamName</h4>
+        using (Html.BeginForm("Delete", "ManageQuizMembers", FormMethod.Post))
+        {
+            <div class="form-group">
+                @Html.HiddenFor(model => model.TeamId, new { Value = team.TeamId })
+                @Html.LabelFor(model => model.MemberId, "Select Member to Delete:")
+                <ul>
+                    @foreach (var member in team.TheMembers)
+                    {
+                        <li>
+                            <input type="radio" name="MemberId" value="@member.MemberId" /> @member.MemberName
+                        </li>
+                    }
+                </ul>
+            </div>
+
+            <button type="submit" class="btn btn-danger">Delete Member from Team</button>
+        }
+        <hr />
+    }
